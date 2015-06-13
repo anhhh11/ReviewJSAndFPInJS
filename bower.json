@@ -1,0 +1,19 @@
+{
+  "name": "JSIntro",
+  "version": "0.0.0",
+  "authors": [
+    "Anh Huy <anhhh.11@gmail.com>"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "ramda": "~0.14.0",
+    "jquery": "~2.1.4"
+  }
+}

@@ -1,0 +1,59 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title></title>
+</head>
+<body>
+    <input type="text" value="" placeholder="keyword" id="keyword"/>
+    <button id="search">search</button>
+    <div id="images">
+
+    </div>
+    <script src="bower_components/jquery/dist/jquery.js"></script>
+    <script src="bower_components/ramda/dist/ramda.js"></script>
+    <script>
+        var _ = R;
+        var trace = _.curry(function (tag, x) {
+            console.log(tag, x);
+            return x;
+        });
+        var Impure = {
+            getJSON: _.curry(function (cb, url) {
+                $.getJSON(url, cb);
+            }),
+            setHtml: _.curry(function (selector, html) {
+                $(selector).html(html);
+            }),
+            getSearchInput: function(selector){
+                return function () {
+                    return $(selector).val();
+                }
+            }
+        };
+        //var law = pipe(map(g),map(f)) == map(pipe(g,f))
+        //AND compose(map(f),map(g)) == map(compose(f,g))
+        var getUrl = function (term) {
+            return "http://api.flickr.com/services/feeds/photos_public.gne?tags=" + term + "&format=json&jsoncallback=?";
+        };
+        var prop = _.curry(function (prop, obj) {
+            return obj[prop];
+        });
+        var getImgTag = function (url) {
+            return $("<img />", { src: url });
+        }
+        var getMediaUrl = _.pipe(prop('media'), prop('m'));
+        //var getMediasUrl = _.pipe(prop('items'), _.map(getMediaUrl));
+        //var getImgsTag = _.pipe(getMediasUrl, _.map(getImgTag));
+        var mediaToImgTag = _.pipe(getMediaUrl, getImgTag);
+        var getImgsTag = _.pipe(prop('items'), _.map(mediaToImgTag));
+
+        var renderImages = _.pipe(getImgsTag, Impure.setHtml("#images"));
+        var app = _.pipe(getUrl, Impure.getJSON(renderImages));
+
+        $("#search").on("click", function () {
+            _.pipe(Impure.getSearchInput("#keyword"),trace("kw"),app)();
+        });
+
+    </script>
+</body>
+</html>

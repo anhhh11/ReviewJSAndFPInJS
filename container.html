@@ -1,0 +1,38 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+    <meta charset="utf-8" />
+</head>
+<body>
+    <script src="bower_components/jquery/dist/jquery.js"></script>
+    <script src="bower_components/ramda/dist/ramda.js"></script>
+    <script>
+        var trace = R.curry(function (tag, x) {
+            console.log(tag, x);
+        });
+
+        var Container = function (x) {
+            this.__value = x;
+        }
+        Container.prototype.map = function (f) {
+            return Container.of(f(this.__value)); // Lay ra, bien doi bang f, dat lai vao hop -> bien doi gia tri trong hop
+        }
+        Container.of = function (x) { return new Container(x); }
+        var c1 = Container.of(1),
+        c2 = Container.of("javacript"),
+        c3 = Container.of(Container.of("box"));
+        c1
+        .map(R.add(2))
+        .map(R.multiply(3))
+        .map(trace("c1"));
+        c2
+        .map(R.flip(R.concat)(" world !!!"))
+        .map(R.prop("length"))
+        .map(trace("c2"));
+        // Container la functor
+        // Functor ho tro `map` va thoa man mot so law(luat)
+        // Container la functor co ban nhat: Identity Functor
+    </script>
+</body>
+</html>

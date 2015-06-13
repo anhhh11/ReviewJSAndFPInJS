@@ -1,0 +1,26 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+    <meta charset="utf-8" />
+</head>
+<body>
+    <script src="bower_components/jquery/dist/jquery.js"></script>
+    <script src="bower_components/ramda/dist/ramda.js"></script>
+    <script src="functional.js"></script>
+    <script src="imperative_tasks.js"></script>
+    <script src="oop_tasks.js"></script>
+    <script src="functional_tasks.js"></script>
+    <script>
+        var _ = R;
+        var p1 = getIncompleteTaskSummariesForMember_imperative("Scott").then(_.compose(fun.trace("scott_imp")))
+        var p2 = getIncompleteTaskSummariesForMember("Scott").then(_.compose(fun.trace("scott_fun")));
+        p1.then(function (t1) {
+            p2.then(function (t2) {
+                fun.trace("t1===t2", R.eqDeep(t1, t2));
+            });
+        });
+
+    </script>
+</body>
+</html>
