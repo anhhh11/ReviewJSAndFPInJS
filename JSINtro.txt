@@ -1,0 +1,473 @@
+A review of core Javascript & Functional programming in JS
+
+A review of core Javascript
+----------------------------------------------------------------------------------------------------
+Các kiểu dữ liệu trong Javascript:
+Primitive type:
+- number
+- string
+- boolean
+- null
+- undefined
+Reference(Object) type:
+- Array
+- Object
+- Date
+- RegExp
+- Function
+Hoisting và Closure
+----------------------------------------------
+Primitive type:
+- number:
+var int_a = 1, 
+	float_b = 1.12, 
+	sci_c = 1e10, 
+	dec_10 = 10,
+	hex_16 = 0xffeeaa,
+	oct_8 = 01234
+	// có thể +,-,*,/,&(and),|(or),~(not),^(xor)  
+	// giữa các kiểu cơ số -> kết quả trả về là dạng cơ số 10
+var number = 1020
+	number.toString(16) // chuyển hệ 10 sang xâu dạng 16: 3fc
+	parseInt(number.toString(16),16) // chuyển từ hệ 16 sang số dạng 10
+	// parseFloat
+- string:
+	var str = "javascript php html css";
+	//Tìm, nếu tìm thấy trả về vị trí nếu không thấy trả về -1
+	str.indexOf("php") // 11 --> Regex: str.indexOf(/php/)
+	//Lấy xâu trong trong khoảng (a,b]
+	str.slice(11,20) // "php html"
+	//Replace xâu
+	str.replace("css","sass") // "javascript php html sass" --> Regex: str.replace(/css/,"sass")
+	//Tách xâu
+	str.split(" ") // ["javascript", "php", "html", "css"] --> Regex: str.split(/[ ]/)
+	//Cộng xâu
+	str + " sass" // "javascript php html css sass"
+	//Lọc xâu con thỏa mãn Regex
+	str.match(/\w+[ ]?/g);  //["javascript", "php", "html", "css"]
+	// Về regex cơ bản: http://regexone.com/, thử online: https://regex101.com/
+- boolean
+	var x = // false, 0, undefined, false, null,""
+	if(x){ //not run here } else { console.log("jump into here") }
+	// kết hơn lại các giá trị trên như VD dưới đây cho kq tương tự:
+	if(false || 0 && undefined){ // not run here} else { console.log("jump into here") }
+- undefined, null
+	//chưa khai báo x
+	console.log(x) //undefined - biến x chưa được khai báo
+	var y = null
+	console.log(y) //null - biến y đã được khai báo được gán giá trị null
+----------------------------------------------
+Reference(Object) type:
+- Array:
+	var arr = [1,.0,"hello",/world/]
+	//Tìm kiếm
+	arr.indexOf("hello") // 2
+	//Lấy mảng con
+	arr.slice(0,2) //[1,0]
+	---CÁC PHƯƠNG THỨC SAU LÀM THAY ĐỔI MẢNG BAN ĐẦU--
+	arr.push(10) // đẩy 10 vào cuối
+	arr.pop() // lấy 1 phần tử ở cuối
+	arr.unshift(10) // đẩy 10 vào đầu
+	arr.shift() // lấy 1 phần tử ở đầu
+	arr.splice(0,2) // lấy phần tử trong khoảng [0,2)
+- Object:
+	//Cú pháp dạng 1: Object literal, dạng JSON --> Chủ yếu dùng lưu dữ liệu hoặc trường hợp không sử dụng kế thừa
+	var user = {
+		name: "abc", 
+		password: "fajklsdf",
+		role: "admin",
+		summaryInfo: function(){
+			return this.name + " " + this.password;
+		}
+	}
+	//Cách xác định ngữ cảnh của `this`: bên phải dấu `.`. Ví dụ user.summaryInfo(), thì `this` trong summaryInfo gắn vói user. Trong trường hợp muốn gắn `this` vào chỗ khác có thể dùng `bind`.VD:
+	//Lưu ý `bind` trả về phương thức mới thay vì làm thay đổi phương thức ban đầu
+	var summaryInfo = user.summaryInfo.bind({
+		name: "hacker",
+		password: "****"
+	});
+	summaryInfo(); // hacker "****
+	
+	//Cú pháp dạng 2: Constructor --> Sử dụng trong trường hợp có kế thừa hoặc biến dạng private
+	function User(name,password,role){
+		var privateInfo = "ex: some thing get from server";
+		this.name = name;
+		this.password = password;
+		this.role = role;
+	}
+	User.prototype.summaryInfo = function(){
+		return this.name + " " + this.password;
+	}
+	var user = new User("abc","fajklsdf","admin");
+	//Kế thừa
+	function VipUser(name,password,role,point){
+		User.call(this,name,password,role);
+		this.point = point;
+	}
+	VipUser.prototype = Object.create(User.prototype);
+	VipUser.prototype.constructor = VipUser;
+	VipUser.prototype.summaryInfo = function(){
+		return User.prototype.summaryInfo.call(this) + ",point:" + this.point;
+	};
+	var vip = new VipUser("abc","def","superadmin",1000);
+	console.log(vip.summaryInfo());
+
+- Date:
+	var now = new Date();
+	now.getYear() // 115, tính từ 1900
+	now.getFullYear() // 2015 
+	// now.<get/set><Day,Month,Year,Hours,Minutes,Seconds,Milliseconds>
+	(new Date()).getTime() // trả về timestamp dạng chính xác tới milliseconds VD: 1433943295659
+	var dateParsed = new Date(1433943295659) // timestamp --> Date object
+	
+- Function:
+	//Normal function
+	function add(a,b){
+		return a+b;
+	}
+	add.length //2, số lượng tham số
+	add.name //add, tên function
+	add.toString() //trả về nội dung hàm nếu là hàm do user tạo
+	
+	//Anonymous function
+	var add = function(a,b){
+		return a+b;
+	};
+	add(2,3) // 5;
+	// Dùng làm callback
+	$.get("times.json",function(data){
+		//do smt
+	});
+	//Thêm tên để dễ debug hơn + khả năng gọi đệ quy
+	$.get("times.json",function processTime(data){
+		//do smt
+	});
+
+	//Số lượng tham số động
+	function show(){
+		return arguments; //lấy tất cả tham số lưu vào args;	
+	}
+	show(1,2,3,4) // [1,2,3,4]
+
+	//this, apply, call
+	//TH1:
+	var obj = {
+		a: 10,
+		b: 11,
+		add: function(){
+			return this.a + this.b
+		}
+	};
+	obj.add();
+	//Muốn sử dụng lại obj.add cho tham số truyền vào --> cần thay thế `this`
+	obj.add.call({a:1,b:2}); //3
+	// hoặc obj.add.apply({a:1,b:2}); //3
+	//TH2:
+	var scores = [20,40,100,120,10,-2];
+	// Math.max(20,10,30) // 30
+	// Math.max([20,10,30]) // NaN
+	Math.max.apply(null,scores) // 120
+	//TH3: curry function ở phần tiếp sau.
+
+............Các hàm/phương thức khác tham khảo trong: Giáo trình JS VT
+	
+- Scope(phạm vi), Hoisting và Closure
+* Phạm vi của JS là phạm vi khai báo variable, function; có 2 phạm vi là global và local(ở trong function), phạm vi mặc định sẽ là global; với các khai báo trùng tên scope trong sẽ shadow scope ngoài hay biến khai báo trong scope trong được sử dụng.
+(Lưu ý: trong JS ES6 phiên bản javascript mới(chưa hỗ trợ đầy đủ bởi các trình duyệt hiện nay), local là phạm vi bên trong cặp `{...}` của if,switch,for, và thay vì dùng từ khóa var, ta dùng từ khóa let)
+VD1: Global vs local
+var x = 1; // x sẽ được khai báo tại global
+function someFunc(){
+	var y = 2;
+	console.log(x,y) 
+}
+someFunc() //1 2
+VD2: Variable shadowing
+var x = 1;
+function someFunc(){
+	var y = 2,x = 10;
+	console.log(x,y) 
+}
+someFunc() //10 2
+VD3: Truy cập global thông qua window
+var x = 1;
+function someFunc(){
+	var y = 2,x = 10;
+	console.log(x,y,window.x) 
+}
+someFunc() //10 2 1
+
+* Hoisting là hành động mặc định của javascript chuyển các khai báo biên lên đầu của scope(trích w3school).
+VD:
+{
+	var x = 10;
+	console.log(x+y); // 30
+	var y = 20;
+} // ??????
+// Javascript engine sẽ dịch code về dạng tương đương
+{
+	var x = 10;
+	var y = 20;
+	console.log(x+y); // 30
+} // tất cả khai báo được đẩy lên đầu scope
+--> Practice: Tất cả các khai báo nên để ở đầu scope(đầu tệp script hay đầu function)
+
+* Closure là một function liên kết với một biến không thuộc scope mà nó tạo ra.
+VD1:
+var a = 100;
+function add(b){
+ return b + a;
+} // Hàm add này là 1 closure ví nó truy cập biến a của global scope
+
+VD2:
+function add(a){
+ return function addA(b){
+  return a + b;
+ }
+} // Hàm nặc danh addA là closure vì nó sử dụng biến của a của hàm add
+var add2To = add(2);
+add2To(3) // 5
+
+VD3: Demo
+//Giả sử có 10 button
+var nodes = document.getElementsByTagName('button');
+for (var i = 0; i < nodes.length; i++) { 
+// tương đương: var i; for (i = 0; i < nodes.length; i++){
+   nodes[i].addEventListener('click', function btnClick() {
+      console.log('You clicked element #' + i);
+   });
+} 
+// Bấm các nút kết quả đề là "You clicked element 10", do btnClick là closure với i gắn với global scope.
+// sửa thành:
+for (var i = 0; i < nodes.length; i++) { 
+   nodes[i].addEventListener('click', (function btnClickGen(i)
+	 return function btnClick(i) {
+      console.log('You clicked element #' + i);
+   })(i));
+}
+----------------------------------------------
+Các thành phần trên trình duyệt
+----------------------------------------------------------------------------------------------------
+
+Functional programming in JS
+----------------------------------------------------------------------------------------------------
+- So sánh code procedure programming với functional programming
+Mục tiêu lấy về từ server các các task của member thỏa mãn điều kiện sau: 
+- là task chưa hoàn thành.
+- chỉ chọn các thuộc tính cần id,priority, title, due date.
+- sắp xếp theo due date.
+* Imperative Approach (46 dòng): 
+	- Nêu ra từng bước thực hiện((imperative)) ở function/procedure.
+* OOP Approach (59 dòng): 
+	- Phân class thực hiện: 2 class TaskList(lọc), TaskListSorter(so sánh)
+	- Nêu ra từng bước thực hiện(imperative) ở từng method(có tính tổ chức hơn)
+	- Có nguyên lý SOLID DRY + Design Pattern.
+* Functional (15 dòng)(Rút gọn nữa còn 13 dòng)
+	- Nêu ra kết quả cần(declarative) giống dạng SQL. 
+	
+----------------------------------------------
+- Đặc điểm/các tính chất của functional programming
+* first-class functions: function được store trong biến, được truyền vào như một tham số của function, được tạo bên trong function và được trả về từ function
+var add = function(a,b){ // lưu hàm vào biến add
+	return a+b;
+}
+var then = function(f){ // truyền hàm f làm tham số
+	var data = "some data";
+	return f(data);
+};
+var add = function(a){
+	var b = function(b){
+		return a + b;
+	}
+	return b; // hàm trả về kết quả là hàm
+};
+
+* higher order functions: là function nhận vào 1 hay nhiều function khác làm tham số, ví dụ như hàm `then` ở trên
+
+* no side-effect: function chỉ tính toán và return lại giá trị mà không tác động đến bên ngoài hay nói cách khác là không thực hiện IO
+VD1: có side-effect
+<code>
+function add(a,b){
+	var ret = a + b;
+	console.log(ret); // đây là side-effect
+	$.post("myserver.com",{ret: ret})// đây là side-effect
+	return ret;
+}
+</code> 
+VD2: không có side-effect: comment lại console.log, $.post
+VD3: dời side effect(sẽ đề cập cụ thể khi đề cập tới Functor,Monad), ý tưởng cơ bản thay vì ngay lập tức thực hiện IO thì delay việc thực hiện và và thực hiện tập trung ở một chỗ:
+//auth.js
+var signUp = function(user,callback){
+	return function(){ //trả về function là một một cách để delay
+		$.post("myserver.com",user,callback);
+	}
+} // hàm signup ở đây không tạo ra side-effect mà nó tạo ra một function(hay `action`) `cuối cùng sẽ thực hiện IO tạo ra side-effect`
+//main.js
+var user1SignUp = signUp({name:"anh",password:"1234"}); //[Function]
+user1SignUp(); // ở đây mới thực hiện IO
+
+* referencial transparency(RT): với một input thì function đó luôn cho cố định một output.
+VD1:
+<code> 
+add(2,3) // 5
+add(2,3) // 5
+</code>
+....gọi mọi lần với tham số giống nhau là 2,3 thì đều cho ra cùng 1 kết quả
+VD2: function không thỏa mãn referencial transparency do có side-effect
+<code>
+function add(a,b){
+	var ret = a + b;
+	console.log(ret); // đây là side-effect
+	return ret;
+}
+//Mỗi lần chạy dù kết quả hàm return kết quả giống nhau nhưng hiển thị trên panel log là thay đổi
+//hay add(2,3);add(3,4) cho kết quả khác với add(3,4);add(2,3)
+</code>
+
+VD3: function không thỏa mãn referencial transparency do sử dụng global variable(hay có sự gán lại giá trị)
+<code>
+var c = 0;
+function addWithBonus(a,b){
+	return a + b  + (++c);
+}
+addWithBonus(2,3) // 5
+addWithBonus(2,3) // 6
+</code>
+VD4: Ví dụ thực tế
+//TODO: chèn ví dụ RT vào đây, đưa ra danh sách các side-effect phổ biến
+--> tính chất RT cho phép ta memoize hàm(hay lưu lại giá trị output theo output); cho phép code có thể chạy concurrency(TODO: dẫn chứng)
+
+* immutability: các biến số(variable) chỉ mang giá trị duy nhất lúc khới tạo và không được thay đổi sau này:
+VD1: Có thể dùng từ khóa `const` thay cho `var` khi khai báo biến
+<code>
+//thay vì
+var x = 100;
+x = x + 1// 101, x bị gán lại -> vi phạm immutability
+//ta dùng
+const x = 100;
+x = x + 1 //101, nhưng x không bị gán lại
+</code>
+Ngoài ra đối với Array,Object ta dùng thư viện lodashJS hay ramdaJS để thao tác để đảm bảo tính immutability, vì phần lớn các hàm của 2 thư viện này đều trả về Array hay Object mới thay vì sửa trên Array,Object input.
+--> t/c này làm code dễ resonning hơn.
+//TODO: chèn ví dụ vào đây
+//John punch....
+
+
+* currying / partial application: 
+- Currying:
+Curried function là hàm trả về hàm đến khi tích lũy đủ tham số mới thực hiện tính toán và đưa ra kết quả.(hàm thông thường + khả năng lưu giữ các tham số đã truyền -> delay chạy hàm đến khi đủ tham số)
+Currying là quá trình chuyển hàm thông thường thành dạng curried.
+VD: hàm thông thường, curry:
+<code>
+function add3(a,b,c){
+ return a + b +c;
+}
+add(2,3,4) // 9
+function add3(a){
+	return function(b){
+		return function(c){
+			return a + b + c;
+		}
+	}
+}
+// nhận xét: sử dụng closure trong javascript để tạo ra các hàm curry này, dạng tổng quát của curry có thể cài đặt bằng hàm reduce(trình bày ở phần sau)
+add2 = add3(2) // function
+add1 = add2(3) // function
+ret = add1(4) // 9
+// hay gọi liên tiếp
+add(2)(3)(4)
+</code>
+- Partial application:
+Là việc chỉ truyền trước một hay mội vài tham số của hàm để trả về hàm mới có các tham số là tham số còn lại(thực chất partial application giống như curry nhưng thay vì tích lũy từng tham số một, 1 lần có thể tích lũy vài tham số
+VD:
+<code>
+//hàm partial apply có thể cài đặt như sau:
+function partial_apply(){
+  var func = arguments[0],args = Array.prototype.splice.call(arguments,1); // bỏ tham số đầu là func, lấy các tham số còn lại
+  return func.bind.apply(func,[null].concat(args)) // bind trả về hàm mới nhưng bind chỉ hỗ trợ truyền danh sách tham số dạng a,b,c, nhưng muốn truyền danh sách tham số thông qua mảng dạng [a,b,c] -> dùng apply
+  // bind implementation: http://stackoverflow.com/questions/22103354/javascripts-bind-implementation
+}
+function add(a,b,c){
+	return a + b +c;
+}
+add1 = partial_apply(add,2,3);
+ret = add1(4);
+</code>
+
+* tail call optimization(TCO): 
+Khả năng tránh tạo stack frame mới khi gọi hàm, hay sử dụng nhất trong trường hợp tail-recursive, trường hợp recursive thì không thực hiện TCO được.
+Trong functional programming đệ quy(hay recursive) được sử dụng thay thế cho loop(như for,while)(Side note: Đệ quy + lazy evaluation tạo thành khả năng hỗ trợ cấu trúc dữ liệu dạng vô hạn trong FP; ví dụ: tạo 1 biến lưu trữ các phần tử từ 10 trong Haskell: let x = [10..])
+VD:
+//TH1: Sử dụng vòng for
+//TODO
+//TH2: trong function programming
+//Dạng 1: Recursive
+//TODO
+//Dạng 2: Tail-recursive
+//TODO
+
+*** Javascript hiện tại chưa hỗ trợ native tail call optimization tuy nhiên các thao tác chủ yếu với dữ liệu có thể thông qua RamdaJS, LodashJS, các thư viện này đã có cách xử lý riêng + cung cấp hàm tổng quan -> chưa cần quan tâm tới vấn đề này. (Có thể gọi async bằng setTimeout để thay cho TCO - có thể tham khảo cách làm ở đây http://stackoverflow.com/questions/14019341/whats-the-difference-between-a-continuation-and-a-callback)
+----------------------------------------------
+- Sử dụng các đặc điểm/các tính chất trong thực hành
+Mục tiêu không phải là biết về functional programming mà là: viết ít code hơn(có PP nào không cần code càng tốt :)), code ít lỗi hơn, dễ dàng concurrency, dễ test.
+* first-class functions, high order function: dùng trong callback
+* no side-effect + referencial transparency + immutability
+	- tránh tối đa sử dụng side-effect trong function, nếu có thể thì chuyển side-effect tới chỗ khác.
+	 -> viết code tập trung, dễ test hơn(thậm chí cho phép test dạng viết ra yêu cầu(specification) để thư viện test tự sinh các trường hợp test)(hàm có side-effect hay IO tách biết với hàm tính toán khác).
+	 -> giải thích code và debug dễ dàng hơn(chỉ bằng thao tác replace)
+	 -> khả năng chia nhỏ đoạn code để chạy song song(hỗ trợ đa nhiệm - multithread) //TODO: giải thích ở đây.
+* immutability: 
+	- nên sử dụng const thay vì var.
+	 -> transformation(biến đổi) dễ hơn là quản lý các state //TODO: giải thích ở đây
+* currying / partial application:
+	- luôn curry hàm có 2 tham số trở lên(để dễ compose tạo hàm mới sau này).
+	- cần cân nhắc thứ tự tham số hàm để sau này có thể compose lại hàm. TODO: nếu ví dụ trong lodashJS.
+	-> khả năng sử dụng và kết hợp các hàm đã viết -> code ngắn hơn, ít bug hơn.
+* TCO: -> chưa quan tâm
+	-> tránh cài đặt dạng đệ quy đuôi(tail recursive) do JS chưa hỗ trợ, thay vào đó kết hợp các hàm của thư viện có sẵn như RamdaJS.
+----------------------------------------------
+- Các hàm thường dùng
+- Các hàm lõi
+* curry, compose
+* map, reduce, filter, forEach
+- Các hàm bổ trợ
+* pluck, flip, prop
+* propEq, pick, sort
+
+Practice
+----------------------------------------------------------------------------------------------------
+- Code lại library asyncJS: https://github.com/caolan/async/blob/master/lib/async.js
+- Code lại library essentialJS: https://github.com/elclanrs/essential.js
+- Cài đặt lại bộ thư viện EssentialJS(tầm 500 dòng - mỗi hàm trung bình dài từ 10,15 dòng ): https://github.com/elclanrs/essential.js/blob/master/lib/essential.js, hoặc cài các hàm quan trọng: curry, map, reduce, filter, nflip, compose, forEach.
+
+
+Tài liệu tham khảo
+----------------------------------------------------------------------------------------------------
+Intro:
+- w3school
+- Javascript Closure (http://javascriptissexy.com/understand-javascript-closures-with-ease/)
+- Javascript Hoist (http://javascriptissexy.com/javascript-variable-scope-and-hoisting-explained/)
+- Javascript Bind (http://javascript.info/tutorial/binding)
+- Javascript Prototype (http://sporto.github.io/blog/2013/02/22/a-plain-english-guide-to-javascript-prototypes/)
+- Javascript OOP https://developer.mozilla.org/en-US/docs/Web/JavaScript/Inheritance_and_the_prototype_chain
+- Eloquent JavaScript http://eloquentjavascript.net
+Functional programming:
+- Functional JavaScript Fundamentals, Srdjan Strbanovic, http://www.slideshare.net/Ssrdjan/functional-javascript-37401024
+- Functional Programming, Scott Sauyet, http://scott.sauyet.com/Javascript/Talk/2014/01/FuncProgTalk/
+- Hey underscore You're doing it wrong, Brian Lonsdorf, https://www.youtube.com/watch?v=m3svKOdZijA
+- Professor Frisby's Mostly Adequate Guide To Functional Programming, Brian Lonsdorf, https://github.com/DrBoolean/mostly-adequate-guide/blob/master/README.md
+- Functional Thinking with Neal Ford, Neal Ford, https://www.youtube.com/watch?v=JeK979aqqqc
+- Structure and Interpretation of Computer Programs, Harold Abelson, and Gerald Sussman with Julie Sussman
+- Learn You a Haskell for Great Good, Miran Lipovača
+- Category Theory For beginners, kenbot, http://www.slideshare.net/kenbot/category-theory-for-beginners
+- Haskell Wiki, https://wiki.haskell.org/Haskell
+
+Bonus Dev Tools
+----------------------------------------------------------------------------------------------------
+- Công cụ tự động refresh trình duyệt Browser-sync, đồng bộ scroll giữa các thiết bị.
+- Sửa tự động HTML, CSS trên Google Chrome.
+- Sử dụng LodashJS(hoặc tốt hơn là RamdaJS)
+
+
+----------------------------------------------------------------------------------------------------
+Phần tiếp:
+- //TODO
